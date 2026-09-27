@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Frameload Stock - gestion des stocks et des ventes">
+    <title>{% block title %}Frameload Stock{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{% static 'css/app.css' %}?v=20260927-2" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+    <div class="app-shell">
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-brand">
+                <span class="brand-mark"><i class="bi bi-box-seam"></i></span>
+                <span>Frameload <strong>Stock</strong></span>
+            </div>
+
+            <div class="sidebar-label">Navigation</div>
+            <nav class="sidebar-nav" aria-label="Navigation principale">
+                {% if is_management %}
+                    <a class="sidebar-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:index' %}">
+                        <i class="bi bi-grid-1x2-fill"></i><span>Tableau de bord</span>
+                    </a>
+                {% endif %}
+                {% if perms.products.view_product or is_employee %}
+                    <a class="sidebar-link {% if request.resolver_match.app_name == 'products' %}active{% endif %}" href="{% url 'products:list' %}">
+                        <i class="bi bi-box-seam"></i><span>Produits</span>
+                    </a>
+                {% endif %}
+                {% if perms.categories.view_category %}
+                    <a class="sidebar-link {% if request.resolver_match.app_name == 'categories' %}active{% endif %}" href="{% url 'categories:list' %}">
+                        <i class="bi bi-tag"></i><span>Catégories</span>
+                    </a>
+                {% endif %}
+                {% if perms.suppliers.view_supplier %}
+                    <a class="sidebar-link {% if request.resolver_match.app_name == 'suppliers' %}active{% endif %}" href="{% url 'suppliers:list' %}">
+                        <i class="bi bi-truck"></i><span>Fournisseurs</span>
+                    </a>
+                {% endif %}
+                {% if perms.stock.view_stockmovement %}
+                    <a class="sidebar-link {% if request.resolver_match.app_name == 'stock' %}active{% endif %}" href="{% url 'stock:list' %}">
+                        <i class="bi bi-boxes"></i><span>Stock</span>
+                    </a>
+                    <a class="sidebar-link sidebar-link-subtle" href="{% url 'stock:alerts' %}">
+                        <i class="bi bi-exclamation-circle"></i><span>Alertes de stock</span>
+                    </a>
+                {% endif %}
+                {% if perms.sales.view_sale %}
+                    <a class="sidebar-link {% if request.resolver_match.app_name == 'sales' %}active{% endif %}" href="{% url 'sales:list' %}">
+                        <i class="bi bi-receipt"></i><span>Ventes</span>
+                    </a>
+                {% elif perms.sales.add_sale %}
+                    <a class="sidebar-link {% if request.resolver_match.app_name == 'sales' %}active{% endif %}" href="{% url 'sales:create' %}">
+                        <i class="bi bi-cart-plus"></i><span>Enregistrer une vente</span>
+                    </a>
+                {% endif %}
+                {% if perms.orders.view_order %}
+                    <a class="sidebar-link {% if request.resolver_match.app_name == 'orders' %}active{% endif %}" href="{% url 'orders:list' %}">
+                        <i class="bi bi-clipboard2-check"></i><span>Commandes</span>
+                    </a>
+                {% endif %}
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <span class="user-avatar"><i class="bi bi-person"></i></span>
+                    <span class="user-details"><strong>{{ user.get_username }}</strong><small>{{ role_label }}</small></span>
+                </div>
+                <a class="sidebar-link logout-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-left"></i><span>Déconnexion</span>
+                </a>
+            </div>
+        </aside>
+
+        <div class="app-main">
+            <header class="topbar">
+                <button class="sidebar-toggle" type="button" aria-controls="appSidebar" aria-expanded="false" aria-label="Ouvrir la navigation">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="topbar-context">{% block page_context %}Espace de gestion{% endblock %}</div>
+                {% if perms.stock.view_stockmovement %}
+                    <div class="notification-menu dropdown">
+                        <button class="notification-button dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications de stock">
+                            <i class="bi bi-bell"></i>
+                            {% if low_stock_unread_count %}<span class="notification-badge">{{ low_stock_unread_count }}</span>{% endif %}
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="notification-heading"><strong>Alertes de stock</strong><span>{{ low_stock_count }}</span></div>
+                            <form class="d-none" id="stock-alert-csrf">{% csrf_token %}</form>
+                            <div class="notification-feedback" role="status" aria-live="polite"></div>
+                            {% for product in low_stock_products %}
+                                <a class="notification-item" href="{% url 'stock:alerts' %}">
+                                    <span class="notification-icon"><i class="bi bi-exclamation-triangle"></i></span>
+                                    <span><strong>{{ product.name }}</strong><small>{{ product.stock_quantity }} en stock / minimum {{ product.minimum_stock }}</small></span>
+                                </a>
+                            {% empty %}
+                                <div class="notification-empty"><i class="bi bi-check-circle"></i><span>Aucune alerte de stock</span></div>
+                            {% endfor %}
+                            <a class="notification-footer" href="{% url 'stock:alerts' %}">Voir toutes les alertes</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </header>
+            <main class="content-wrap">
+{% else %}
+    <nav class="public-navbar" aria-label="Navigation publique">
+        <div class="public-navbar-inner">
+            <a class="public-brand" href="{% url 'home' %}">
+                <span class="brand-mark"><i class="bi bi-box-seam"></i></span>
+                <span>Frameload <strong>Stock</strong></span>
+            </a>
+            <button class="public-nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavMenu" aria-controls="publicNavMenu" aria-expanded="false" aria-label="Ouvrir le menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="public-menu collapse" id="publicNavMenu">
+                <div class="public-nav-links">
+                    <a href="{% url 'home' %}">Accueil</a>
+                    
+                </div>
+                <a class="btn btn-primary public-login" href="{% url 'login' %}">
+                    <i class="bi bi-box-arrow-in-right me-1"></i>Connexion
+                </a>
+            </div>
+        </div>
+    </nav>
+    <main class="auth-shell">
+{% endif %}
+{% if messages %}
+    <div class="container-fluid px-0 mb-3" aria-live="polite">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show" role="status">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% block content %}{% endblock %}
+{% if user.is_authenticated %}</main></div></div>{% else %}</main>{% endif %}
+<footer class="site-footer">
+    <span><i class="bi bi-box-seam me-1"></i> Frameload Stock</span>
+    <span>Gestion simple et sécurisée de votre activité</span>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelectorAll("form").forEach(function (form) {
+        form.addEventListener("submit", function () {
+            const submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (!submitButton || submitButton.disabled) {
+                return;
+            }
+            submitButton.disabled = true;
+            if (submitButton.tagName === "BUTTON") {
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Chargement des données...';
+            } else {
+                submitButton.value = "Chargement des données...";
+            }
+            submitButton.setAttribute("aria-busy", "true");
+        });
+    });
+    const sidebarToggle = document.querySelector(".sidebar-toggle");
+    const sidebar = document.querySelector(".app-sidebar");
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener("click", function () {
+            const isOpen = sidebar.classList.toggle("show");
+            sidebarToggle.setAttribute("aria-expanded", isOpen);
+        });
+    }
+    const notificationMenu = document.querySelector(".notification-menu");
+    if (notificationMenu) {
+        notificationMenu.addEventListener("show.bs.dropdown", async function () {
+            if (notificationMenu.dataset.acknowledged === "true" || notificationMenu.dataset.acknowledging === "true") {
+                return;
+            }
+            const csrfToken = document.querySelector("#stock-alert-csrf [name=csrfmiddlewaretoken]");
+            const feedback = notificationMenu.querySelector(".notification-feedback");
+            notificationMenu.dataset.acknowledging = "true";
+            try {
+                const response = await fetch("{% url 'acknowledge_stock_alerts' %}", {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: {
+                        "X-CSRFToken": csrfToken.value,
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status);
+                }
+                notificationMenu.dataset.acknowledged = "true";
+                const badge = notificationMenu.querySelector(".notification-badge");
+                if (badge) {
+                    badge.remove();
+                }
+                feedback.textContent = "";
+            } catch (error) {
+                feedback.textContent = "Les alertes n’ont pas pu être marquées comme consultées. Réessayez.";
+            } finally {
+                delete notificationMenu.dataset.acknowledging;
+            }
+        });
+    }
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

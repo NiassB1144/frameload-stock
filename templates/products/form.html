@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}
+Produit - Frameload Stock
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+<!-- En-tête -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+
+    <div>
+        <h1 class="fw-bold mb-1">
+            {% if form.instance.pk %}
+                Modifier le produit
+            {% else %}
+                Ajouter un produit
+            {% endif %}
+        </h1>
+
+        <p class="text-muted mb-0">
+            {% if form.instance.pk %}
+                Modifiez les informations du produit.
+            {% else %}
+                Enregistrez un nouveau produit dans le stock.
+            {% endif %}
+        </p>
+    </div>
+
+    <a
+        href="{% if perms.products.view_product or is_employee %}{% url 'products:list' %}{% else %}{% url 'home' %}{% endif %}"
+        class="btn btn-outline-secondary"
+    >
+        <i class="bi bi-arrow-left me-1"></i>Retour
+    </a>
+
+</div>
+
+
+<!-- Formulaire -->
+<div class="row justify-content-center">
+
+    <div class="col-12 col-lg-10">
+
+        <div class="card border shadow-sm">
+
+            <div class="card-body p-4 p-md-5">
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+
+                    <!-- Informations du produit -->
+                    <h2 class="h5 fw-bold mb-4">
+                        Informations du produit
+                    </h2>
+
+                    <div class="row">
+
+                        <!-- Nom -->
+                        <div class="col-12 col-md-6 mb-4">
+
+                            <label
+                                for="{{ form.name.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Nom du produit
+                            </label>
+
+                            {{ form.name }}
+
+                            {% if form.name.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.name.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Référence automatique -->
+                        <div class="col-12 col-md-6 mb-4">
+                            <label class="form-label fw-semibold">Référence</label>
+                            {% if form.instance.reference %}
+                                <div class="auto-reference"><i class="bi bi-upc-scan me-2"></i>{{ form.instance.reference }}</div>
+                            {% else %}
+                                <div class="form-help"><i"></i>Générée automatiquement au format P-XXXXXXXX</div>
+                            {% endif %}
+                        </div>
+
+
+                        <!-- Catégorie -->
+                        <div class="col-12 col-md-6 mb-4">
+
+                            <label
+                                for="{{ form.category.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Catégorie
+                            </label>
+
+                            {{ form.category }}
+
+                            {% if form.category.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.category.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Fournisseur -->
+                        <div class="col-12 col-md-6 mb-4">
+
+                            <label
+                                for="{{ form.supplier.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Fournisseur
+                            </label>
+
+                            {{ form.supplier }}
+
+                            {% if form.supplier.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.supplier.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Description -->
+                        <div class="col-12 mb-4">
+
+                            <label
+                                for="{{ form.description.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Description
+                            </label>
+
+                            {{ form.description }}
+
+                            {% if form.description.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.description.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <!-- Prix et stock -->
+                    <h2 class="h5 fw-bold mb-4">
+                        Prix et stock
+                    </h2>
+
+                    <div class="row">
+
+                        <!-- Prix achat -->
+                        <div class="col-12 col-md-6 col-lg-3 mb-4">
+
+                            <label
+                                for="{{ form.purchase_price.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Prix d'achat
+                            </label>
+
+                            {{ form.purchase_price }}
+
+                            {% if form.purchase_price.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.purchase_price.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Prix vente -->
+                        <div class="col-12 col-md-6 col-lg-3 mb-4">
+
+                            <label
+                                for="{{ form.selling_price.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Prix de vente
+                            </label>
+
+                            {{ form.selling_price }}
+
+                            {% if form.selling_price.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.selling_price.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Stock -->
+                        <div class="col-12 col-md-6 col-lg-3 mb-4">
+
+                            <label
+                                for="{{ form.stock_quantity.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Quantité en stock
+                            </label>
+
+                            {{ form.stock_quantity }}
+
+                            {% if form.stock_quantity.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.stock_quantity.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Stock minimum -->
+                        <div class="col-12 col-md-6 col-lg-3 mb-4">
+
+                            <label
+                                for="{{ form.minimum_stock.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Stock minimum
+                            </label>
+
+                            {{ form.minimum_stock }}
+
+                            {% if form.minimum_stock.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.minimum_stock.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <!-- Boutons -->
+                    <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
+
+                        <a
+                            href="{% if perms.products.view_product or is_employee %}{% url 'products:list' %}{% else %}{% url 'home' %}{% endif %}"
+                            class="btn btn-light border"
+                        >
+                            <i class="bi bi-x-lg me-1"></i>Annuler
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary px-4"
+                        >
+                            {% if form.instance.pk %}<i class="bi bi-check2 me-1"></i>Enregistrer les modifications{% else %}<i class="bi bi-plus-lg me-1"></i>Ajouter le produit{% endif %}
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

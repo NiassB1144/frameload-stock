@@ -1,0 +1,208 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Nouvelle vente</h2>
+            <p class="text-muted mb-0">
+                Enregistrer une nouvelle vente
+            </p>
+        </div>
+
+        <a href="{% if perms.sales.view_sale %}{% url 'sales:list' %}{% else %}{% url 'home' %}{% endif %}"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Retour
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4">
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Informations du client -->
+                <h5 class="fw-bold mb-3">
+                    Informations du client
+                </h5>
+
+                <div class="row g-4">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Nom du client
+                        </label>
+
+                        {{ sale_form.client_name }}
+
+                        {% if sale_form.client_name.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ sale_form.client_name.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Téléphone
+                        </label>
+
+                        {{ sale_form.client_phone }}
+
+                        {% if sale_form.client_phone.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ sale_form.client_phone.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Produit vendu -->
+                <h5 class="fw-bold mb-3">
+                    Produit vendu
+                </h5>
+
+                <div class="row g-4">
+
+                    <!-- Produit -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Produit
+                        </label>
+
+                        <select name="product"
+                                id="id_product"
+                                class="form-select"
+                                required>
+
+                            <option value="">- Sélectionner un produit -</option>
+
+                            {% for product in item_form.product.field.queryset %}
+                                <option value="{{ product.id }}"
+                                        data-price="{{ product.selling_price }}"
+                                        data-stock="{{ product.stock_quantity }}">
+                                    {{ product.name }}
+                                </option>
+                            {% endfor %}
+
+                        </select>
+
+                        {% if item_form.product.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ item_form.product.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Quantité -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Quantité
+                        </label>
+
+                        {{ item_form.quantity }}
+
+                        {% if item_form.quantity.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ item_form.quantity.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <!-- Prix et total -->
+                <div class="row g-4 mt-2">
+
+                    <div class="col-md-6">
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <p class="text-muted mb-1">
+                                    Prix unitaire
+                                </p>
+
+                                <h5 class="fw-bold mb-0">
+                                    <span id="unit-price">0</span> FCFA
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <p class="text-muted mb-1">
+                                    Total
+                                </p>
+
+                                <h4 class="fw-bold mb-0">
+                                    <span id="total-price">0</span> FCFA
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Boutons -->
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+
+                    <a href="{% if perms.sales.view_sale %}{% url 'sales:list' %}{% else %}{% url 'home' %}{% endif %}"
+                       class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg me-1"></i>Annuler
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check2 me-1"></i>Enregistrer la vente
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Calcul automatique du prix et du total -->
+<script>
+    const productSelect = document.getElementById("id_product");
+    const quantityInput = document.getElementById("id_quantity");
+    const unitPrice = document.getElementById("unit-price");
+    const totalPrice = document.getElementById("total-price");
+
+    function calculateTotal() {
+
+        const selectedOption =
+            productSelect.options[productSelect.selectedIndex];
+
+        const price =
+            parseFloat(selectedOption.dataset.price || 0);
+
+        const quantity =
+            parseInt(quantityInput.value || 0);
+
+        const total = price * quantity;
+
+        unitPrice.textContent =
+            price.toLocaleString("fr-FR");
+
+        totalPrice.textContent =
+            total.toLocaleString("fr-FR");
+    }
+
+    productSelect.addEventListener("change", calculateTotal);
+    quantityInput.addEventListener("input", calculateTotal);
+</script>
+
+{% endblock %}

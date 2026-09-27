@@ -1,0 +1,98 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Alertes de stock</h2>
+            <p class="text-muted mb-0">
+                Produits dont le stock est faible
+            </p>
+        </div>
+
+        <a href="{% url 'stock:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Retour au stock
+        </a>
+    </div>
+
+    {% if products %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Produit</th>
+                            <th>Référence</th>
+                            <th>Stock actuel</th>
+                            <th>Stock minimum</th>
+                            <th>État</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for product in products %}
+                        <tr>
+
+                            <td class="fw-semibold">
+                                {{ product.name }}
+                            </td>
+
+                            <td>
+                                {{ product.reference }}
+                            </td>
+
+                            <td>
+                                <span class="badge bg-danger">
+                                    {{ product.stock_quantity }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ product.minimum_stock }}
+                            </td>
+
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    Stock faible
+                                </span>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    {% else %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+
+            <h5 class="fw-bold">Aucune alerte</h5>
+
+            <p class="text-muted mb-0">
+                Tous les produits ont un niveau de stock suffisant.
+            </p>
+
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

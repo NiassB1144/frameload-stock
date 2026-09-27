@@ -1,0 +1,253 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">
+            {% if order %}Modifier la commande{% else %}Nouvelle commande{% endif %}
+        </h2>
+
+        <p class="text-muted mb-0">
+            {% if order %}Mettre à jour les informations et le produit{% else %}Enregistrer une nouvelle commande{% endif %}
+        </p>
+    </div>
+
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4">
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <h5 class="fw-bold mb-3">
+                    Informations de la commande
+                </h5>
+
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Numéro de commande</label>
+                        {% if order %}
+                            <div class="auto-reference"><i class="bi bi-receipt me-2"></i>{{ order.number }}</div>
+                        {% else %}
+                            <div class="form-help"><i></i>CMD-XXXXXXXX</div>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Statut
+                        </label>
+
+                        {{ order_form.status }}
+
+                        {% if order_form.status.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ order_form.status.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Nom du client
+                        </label>
+
+                        {{ order_form.client_name }}
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Téléphone du client
+                        </label>
+
+                        {{ order_form.client_phone }}
+
+                    </div>
+
+                </div>
+
+
+                <hr class="my-4">
+
+
+                <h5 class="fw-bold mb-3">
+                    Produit commandé
+                </h5>
+
+
+                <div class="row g-3">
+
+                    <div class="col-md-8">
+
+                        <label class="form-label fw-semibold">
+                            Produit
+                        </label>
+
+                        {{ item_form.product }}
+
+                        {% if item_form.product.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ item_form.product.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label fw-semibold">
+                            Quantité
+                        </label>
+
+                        {{ item_form.quantity }}
+
+                        {% if item_form.quantity.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ item_form.quantity.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="alert alert-light border mt-4">
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <strong>
+                                Prix unitaire :
+                            </strong>
+
+                            <span id="unit-price">
+                                0
+                            </span>
+
+                            FCFA
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <strong>
+                                Total :
+                            </strong>
+
+                            <span id="total-price">
+                                0
+                            </span>
+
+                            FCFA
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="d-flex gap-2 mt-4">
+
+                    <a
+                        href="{% if perms.orders.view_order %}{% url 'orders:list' %}{% else %}{% url 'home' %}{% endif %}"
+                        class="btn btn-outline-secondary"
+                    >
+                        <i class="bi bi-x-lg me-1"></i>Annuler
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        {% if order %}<i class="bi bi-check2 me-1"></i>Enregistrer les modifications{% else %}<i class="bi bi-check2 me-1"></i>Enregistrer la commande{% endif %}
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const productSelect = document.getElementById("id_product");
+const quantityInput = document.getElementById("id_quantity");
+
+const unitPrice = document.getElementById("unit-price");
+const totalPrice = document.getElementById("total-price");
+
+
+const productPrices = {
+
+    {% for product in item_form.fields.product.queryset %}
+        "{{ product.id }}": {{ product.selling_price }},
+    {% endfor %}
+
+};
+
+
+function calculateTotal() {
+
+    const productId = productSelect.value;
+
+    const price =
+        parseFloat(productPrices[productId] || 0);
+
+    const quantity =
+        parseInt(quantityInput.value || 0);
+
+    const total =
+        price * quantity;
+
+
+    unitPrice.textContent =
+        price.toLocaleString("fr-FR");
+
+
+    totalPrice.textContent =
+        total.toLocaleString("fr-FR");
+
+}
+
+
+productSelect.addEventListener(
+    "change",
+    calculateTotal
+);
+
+
+quantityInput.addEventListener(
+    "input",
+    calculateTotal
+);
+
+</script>
+
+{% endblock %}

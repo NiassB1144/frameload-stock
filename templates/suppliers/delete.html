@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}
+Supprimer un fournisseur - Frameload Stock
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+```
+<div class="row justify-content-center">
+
+    <div class="col-12 col-md-8 col-lg-6">
+
+        <!-- En-tête -->
+        <div class="text-center mb-4">
+
+            <h1 class="fw-bold mb-2">
+                Supprimer un fournisseur
+            </h1>
+
+            <p class="text-muted mb-0">
+                Cette action nécessite une confirmation.
+            </p>
+
+        </div>
+
+
+        <!-- Carte -->
+        <div class="card border shadow-sm">
+
+            <div class="card-body p-4 p-md-5 text-center">
+
+                <div class="mb-4">
+                    <div class="fs-1 text-danger">
+                        ⚠
+                    </div>
+                </div>
+
+                <h2 class="h5 fw-semibold mb-3">
+                    Confirmer la suppression
+                </h2>
+
+                <p class="text-muted mb-4">
+                    Voulez-vous vraiment supprimer le fournisseur
+                    <strong class="text-dark">
+                        {{ supplier.name }}
+                    </strong> ?
+                </p>
+
+                <div class="alert alert-warning text-start">
+                    <strong>Attention :</strong>
+                    cette action est définitive.
+                </div>
+
+
+                <!-- Actions -->
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+
+                        <a
+                            href="{% if perms.suppliers.view_supplier %}{% url 'suppliers:list' %}{% else %}{% url 'home' %}{% endif %}"
+                            class="btn btn-light border px-4"
+                        >
+                            <i class="bi bi-x-lg me-1"></i>Annuler
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger px-4"
+                        >
+                            <i class="bi bi-trash3 me-1"></i>Oui, supprimer
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+{% endblock %}

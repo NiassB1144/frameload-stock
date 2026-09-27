@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}
+Fournisseurs - Frameload Stock
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+<!-- En-tête -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+
+    <div>
+        <h1 class="fw-bold mb-1">
+            Fournisseurs
+        </h1>
+
+        <p class="text-muted mb-0">
+            Gestion des fournisseurs de l'entreprise
+        </p>
+    </div>
+
+    <a
+        href="{% url 'suppliers:create' %}"
+        class="btn btn-primary"
+    >
+        <i class="bi bi-plus-lg me-2"></i>Ajouter un fournisseur
+    </a>
+
+</div>
+
+<form method="get" class="filter-bar card mb-4">
+    <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input class="form-control" type="search" name="q" value="{{ query }}" placeholder="Rechercher un fournisseur, une société, un e-mail">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Filtrer</button>
+        {% if query %}<a class="btn btn-outline-secondary" href="{% url 'suppliers:list' %}"><i class="bi bi-arrow-counterclockwise me-1"></i>Réinitialiser</a>{% endif %}
+    </div>
+</form>
+
+
+{% if suppliers %}
+
+<!-- Tableau -->
+<div class="card border shadow-sm">
+
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-dark">
+
+                    <tr>
+                        <th class="text-center" style="width: 70px;">
+                            N°
+                        </th>
+
+                        <th>Nom</th>
+
+                        <th>Entreprise</th>
+
+                        <th>Email</th>
+
+                        <th>Téléphone</th>
+
+                        <th>Adresse</th>
+
+                        <th class="text-center">
+                            Actions
+                        </th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for supplier in suppliers %}
+
+                    <tr>
+
+                        <td class="text-center fw-semibold">
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td class="fw-semibold">
+                            {{ supplier.name }}
+                        </td>
+
+                        <td>
+                            {{ supplier.company }}
+                        </td>
+
+                        <td>
+                            {% if supplier.email %}
+                                {{ supplier.email }}
+                            {% else %}
+                                <span class="text-muted">
+                                    Non renseigné
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if supplier.phone %}
+                                {{ supplier.phone }}
+                            {% else %}
+                                <span class="text-muted">
+                                    Non renseigné
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if supplier.address %}
+                                {{ supplier.address }}
+                            {% else %}
+                                <span class="text-muted">
+                                    Non renseignée
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-center">
+
+                            <div class="d-flex justify-content-center gap-1">
+
+                                <a
+                                    href="{% url 'suppliers:update' supplier.pk %}"
+                                    class="btn btn-outline-warning btn-sm"
+                                >
+                                    <i class="bi bi-pencil me-1"></i>Modifier
+                                </a>
+
+                                <a
+                                    href="{% url 'suppliers:delete' supplier.pk %}"
+                                    class="btn btn-outline-danger btn-sm"
+                                >
+                                    <i class="bi bi-trash3 me-1"></i>Supprimer
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<!-- Aucun fournisseur -->
+<div class="card border shadow-sm">
+
+    <div class="card-body text-center py-5">
+
+        <h5 class="fw-semibold">
+            Aucun fournisseur
+        </h5>
+
+        <p class="text-muted mb-4">
+            {% if query %}
+                Aucun fournisseur ne correspond à votre recherche.
+            {% else %}
+                Aucun fournisseur n'a encore été enregistré.
+            {% endif %}
+        </p>
+
+        {% if not query %}<a
+            href="{% url 'suppliers:create' %}"
+            class="btn btn-primary"
+        >
+            <i class="bi bi-plus-lg me-2"></i>Ajouter le premier fournisseur
+        </a>{% endif %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+</div>
+
+{% endblock %}

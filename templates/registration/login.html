@@ -1,0 +1,159 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+    Connexion - Frameload Stock
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-5 col-lg-4">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body p-4">
+
+
+                    <!-- ====================================== -->
+                    <!-- TITRE -->
+                    <!-- ====================================== -->
+
+                    <div class="text-center mb-4">
+
+                        <i
+                            class="bi bi-box-seam text-primary"
+                            style="font-size: 3rem;"
+                        ></i>
+
+                        <h3 class="fw-bold mt-2">
+                            Frameload Stock
+                        </h3>
+
+                        <p class="text-muted">
+                            Connexion à votre espace
+                        </p>
+
+                    </div>
+
+
+                    <!-- ====================================== -->
+                    <!-- MESSAGE D'ERREUR -->
+                    <!-- ====================================== -->
+
+                    {% if error %}
+
+                        <div
+                            class="alert alert-danger"
+                            role="alert"
+                        >
+                            <i class="bi bi-exclamation-circle me-2"></i>
+                            {{ error }}
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- ====================================== -->
+                    <!-- FORMULAIRE -->
+                    <!-- ====================================== -->
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+
+                        <!-- Nom utilisateur -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="username"
+                                class="form-label"
+                            >
+                                Nom d'utilisateur
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="bi bi-person"></i>
+                                </span>
+
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    class="form-control"
+                                    placeholder="Votre nom d'utilisateur"
+                                    autocomplete="username"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Mot de passe -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="password"
+                                class="form-label"
+                            >
+                                Mot de passe
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    class="form-control"
+                                    placeholder="Votre mot de passe"
+                                    autocomplete="current-password"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Bouton -->
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100"
+                        >
+
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+
+                            Se connecter
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

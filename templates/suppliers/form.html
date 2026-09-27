@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}
+Fournisseur - Frameload Stock
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+
+<!-- En-tête -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+
+    <div>
+        <h1 class="fw-bold mb-1">
+            {% if form.instance.pk %}
+                Modifier le fournisseur
+            {% else %}
+                Ajouter un fournisseur
+            {% endif %}
+        </h1>
+
+        <p class="text-muted mb-0">
+            {% if form.instance.pk %}
+                Modifiez les informations du fournisseur.
+            {% else %}
+                Enregistrez un nouveau fournisseur.
+            {% endif %}
+        </p>
+    </div>
+
+    <a
+        href="{% if perms.suppliers.view_supplier %}{% url 'suppliers:list' %}{% else %}{% url 'home' %}{% endif %}"
+        class="btn btn-outline-secondary"
+    >
+        <i class="bi bi-arrow-left me-1"></i>Retour
+    </a>
+
+</div>
+
+
+<!-- Formulaire -->
+<div class="row justify-content-center">
+
+    <div class="col-12 col-md-10 col-lg-8">
+
+        <div class="card border shadow-sm">
+
+            <div class="card-body p-4 p-md-5">
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <!-- Nom -->
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ form.name.id_for_label }}"
+                            class="form-label fw-semibold"
+                        >
+                            Nom
+                        </label>
+
+                        {{ form.name }}
+
+                        {% if form.name.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.name.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Entreprise -->
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ form.company.id_for_label }}"
+                            class="form-label fw-semibold"
+                        >
+                            Entreprise
+                        </label>
+
+                        {{ form.company }}
+
+                        {% if form.company.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.company.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Email -->
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ form.email.id_for_label }}"
+                            class="form-label fw-semibold"
+                        >
+                            Email
+                        </label>
+
+                        {{ form.email }}
+
+                        {% if form.email.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.email.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Téléphone -->
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ form.phone.id_for_label }}"
+                            class="form-label fw-semibold"
+                        >
+                            Téléphone
+                        </label>
+
+                        {{ form.phone }}
+
+                        {% if form.phone.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.phone.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Adresse -->
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ form.address.id_for_label }}"
+                            class="form-label fw-semibold"
+                        >
+                            Adresse
+                        </label>
+
+                        {{ form.address }}
+
+                        {% if form.address.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.address.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <!-- Boutons -->
+                    <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
+
+                        <a
+                            href="{% if perms.suppliers.view_supplier %}{% url 'suppliers:list' %}{% else %}{% url 'home' %}{% endif %}"
+                            class="btn btn-light border"
+                        >
+                            <i class="bi bi-x-lg me-1"></i>Annuler
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary px-4"
+                        >
+                            {% if form.instance.pk %}<i class="bi bi-check2 me-1"></i>Enregistrer les modifications{% else %}<i class="bi bi-plus-lg me-1"></i>Ajouter le fournisseur{% endif %}
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

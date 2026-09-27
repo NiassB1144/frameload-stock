@@ -1,0 +1,159 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Ventes</h2>
+            <p class="text-muted mb-0">
+                Ventes enregistrées · {{ total_sales }} vente(s)
+            </p>
+        </div>
+
+        <a href="{% url 'sales:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Nouvelle vente
+        </a>
+    </div>
+
+    <form method="get" class="filter-bar card mb-4">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input class="form-control" type="search" name="q" value="{{ query }}" placeholder="Client, téléphone ou numéro de vente">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Filtrer</button>
+            {% if query %}<a class="btn btn-outline-secondary" href="{% url 'sales:list' %}"><i class="bi bi-arrow-counterclockwise me-1"></i>Réinitialiser</a>{% endif %}
+        </div>
+    </form>
+
+    <!-- Tableau -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+
+            {% if sales %}
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>N°</th>
+                            <th>Vente</th>
+                            <th>Client</th>
+                            <th>Téléphone</th>
+                            <th>Produits vendus / Quantités</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for sale in sales %}
+                        <tr>
+
+                            <!-- Numéro dans la liste -->
+                            <td class="fw-semibold">
+                                {{ forloop.counter }}
+                            </td>
+
+                            <!-- Numéro de la vente -->
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    {{ sale.reference }}
+                                </span>
+                            </td>
+
+                            <!-- Nom du client -->
+                            <td>
+                                {% if sale.client_name %}
+                                    {{ sale.client_name }}
+                                {% else %}
+                                    <span class="text-muted">
+                                        Client non renseigné
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Téléphone du client -->
+                            <td>
+                                {% if sale.client_phone %}
+                                    {{ sale.client_phone }}
+                                {% else %}
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Produits et quantités vendus -->
+                            <td>
+                                {% if sale.items %}
+                                    <ul class="list-unstyled mb-0">
+                                        {% for item in sale.items %}
+                                            <li>
+                                                {{ item.product_name }}
+                                                <span class="badge bg-light text-dark border">× {{ item.quantity }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="text-muted">Aucun détail enregistré</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Total -->
+                            <td class="fw-semibold">
+                                {{ sale.total }} FCFA
+                            </td>
+
+                            <!-- Date -->
+                            <td>
+                                {{ sale.created_at|date:"d/m/Y H:i" }}
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+            {% else %}
+
+            <!-- État vide -->
+            <div class="text-center py-5">
+
+                <div class="mb-3">
+                    <i class="bi bi-cart-x fs-1 text-muted"></i>
+                </div>
+
+                <h5 class="fw-bold">
+                    Aucune vente
+                </h5>
+
+                <p class="text-muted">
+                    {% if query %}
+                        Aucune vente ne correspond à votre recherche.
+                    {% else %}
+                        Aucune vente n'a encore été enregistrée.
+                    {% endif %}
+                </p>
+
+                {% if not query %}<a href="{% url 'sales:create' %}" class="btn btn-primary">
+                    <i class="bi bi-cart-plus me-1"></i>Enregistrer une vente
+                </a>{% endif %}
+
+            </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

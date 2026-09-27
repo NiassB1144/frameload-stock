@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord - Frameload Stock{% endblock %}
+{% block page_context %}Vue d’ensemble{% endblock %}
+
+{% block content %}
+<div>
+    <div class="mb-4">
+        <div class="eyebrow mb-2">Pilotage</div>
+        <h1 class="page-title h2 mb-1">Tableau de bord</h1>
+        <p class="text-muted mb-0">Résumé de l’activité et de l’état du stock.</p>
+    </div>
+
+    <h2 class="h5 mb-3">Activité générale</h2>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Produits</span><i class="bi bi-box-seam text-primary"></i></div>
+                <p class="dashboard-number">{{ total_products }}</p><small class="text-muted">Produits enregistrés</small>
+            </div></article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Catégories</span><i class="bi bi-tag text-primary"></i></div>
+                <p class="dashboard-number">{{ total_categories }}</p><small class="text-muted">Catégories enregistrées</small>
+            </div></article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Fournisseurs</span><i class="bi bi-truck text-primary"></i></div>
+                <p class="dashboard-number">{{ total_suppliers }}</p><small class="text-muted">Fournisseurs enregistrés</small>
+            </div></article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Quantité en stock</span><i class="bi bi-boxes text-primary"></i></div>
+                <p class="dashboard-number">{{ total_stock }}</p><small class="text-muted">Unités disponibles</small>
+            </div></article>
+        </div>
+    </div>
+
+    <h2 class="h5 mb-3">Ventes et chiffre d’affaires</h2>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Ventes comptabilisées</span><i class="bi bi-receipt text-primary"></i></div>
+                <p class="dashboard-number">{{ total_sales }}</p><small class="text-muted">Ventes enregistrées</small>
+            </div></article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Chiffre d’affaires total</span><i class="bi bi-graph-up-arrow text-primary"></i></div>
+                <p class="dashboard-number dashboard-money">{{ chiffre_affaires|floatformat:0 }} FCFA</p><small class="text-muted">Ventes enregistrées</small>
+            </div></article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Ventes aujourd’hui</span><i class="bi bi-calendar-check text-primary"></i></div>
+                <p class="dashboard-number">{{ ventes_aujourd_hui }}</p><small class="text-muted">Ventes enregistrées aujourd’hui</small>
+            </div></article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Chiffre aujourd’hui</span><i class="bi bi-cash-coin text-primary"></i></div>
+                <p class="dashboard-number dashboard-money">{{ chiffre_affaires_aujourd_hui|floatformat:0 }} FCFA</p><small class="text-muted">Ventes du jour</small>
+            </div></article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Chiffre ce mois</span><i class="bi bi-calendar-month text-primary"></i></div>
+                <p class="dashboard-number dashboard-money">{{ chiffre_affaires_ce_mois|floatformat:0 }} FCFA</p><small class="text-muted">Depuis le début du mois</small>
+            </div></article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Commandes en attente</span><i class="bi bi-clock-history text-primary"></i></div>
+                <p class="dashboard-number">{{ commandes_en_attente }}</p><small class="text-muted">À traiter</small>
+            </div></article>
+        </div>
+    </div>
+
+    <h2 class="h5 mb-3">État du stock</h2>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">Stock faible</span><i class="bi bi-exclamation-triangle text-warning"></i></div>
+                <p class="dashboard-number">{{ produits_stock_faible }}</p><small class="text-muted">Au-dessus de zéro, sous le seuil</small>
+            </div></article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="card h-100"><div class="card-body">
+                <div class="d-flex justify-content-between"><span class="text-muted">En rupture</span><i class="bi bi-x-circle text-danger"></i></div>
+                <p class="dashboard-number">{{ produits_en_rupture }}</p><small class="text-muted">Produits sans unité disponible</small>
+            </div></article>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-7">
+            <section class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5 mb-1">Chiffre d’affaires des 7 derniers jours</h2>
+                    <p class="text-muted small mb-3">Ventes enregistrées, jour par jour.</p>
+                    {% for day in daily_revenue %}
+                        <div class="dashboard-chart-row">
+                            <span class="dashboard-chart-date">{{ day.date_label }}</span>
+                            <div class="progress flex-grow-1" role="progressbar" aria-label="Chiffre d’affaires du {{ day.date|date:'d/m/Y' }}" aria-valuenow="{{ day.percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: {{ day.percentage }}%"></div>
+                            </div>
+                            <span class="dashboard-chart-total">{{ day.total|floatformat:0 }} FCFA</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-5">
+            <section class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Produits les plus vendus</h2>
+                    <div class="dashboard-list-scroll" role="region" aria-label="Liste des produits les plus vendus" tabindex="0">
+                        {% for product in top_products %}
+                            <div class="d-flex justify-content-between gap-3 py-2 border-bottom">
+                                <span class="text-truncate">{{ product.name }}</span>
+                                <span class="text-nowrap fw-semibold">{{ product.quantity_sold }} unité(s)</span>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted mb-0">Aucune vente enregistrée.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <section class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Produits en stock faible</h2>
+                    <div class="dashboard-list-scroll" role="region" aria-label="Liste des produits en stock faible" tabindex="0">
+                        {% for product in low_stock_products %}
+                            <div class="d-flex justify-content-between gap-3 py-2 border-bottom">
+                                <span class="text-truncate">{{ product.name }}</span>
+                                <span class="text-nowrap">{{ product.stock_quantity }} / {{ product.minimum_stock }}</span>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted mb-0">Aucun produit en stock faible.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-6">
+            <section class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Produits en rupture</h2>
+                    <div class="dashboard-list-scroll" role="region" aria-label="Liste des produits en rupture de stock" tabindex="0">
+                        {% for product in out_of_stock_products %}
+                            <div class="d-flex justify-content-between gap-3 py-2 border-bottom">
+                                <span class="text-truncate">{{ product.name }}</span>
+                                <span class="badge text-bg-danger">Stock : 0</span>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted mb-0">Aucun produit en rupture.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <section class="card">
+        <div class="card-body">
+            <h2 class="h5 mb-3">Ventes récentes</h2>
+            <div class="dashboard-list-scroll dashboard-recent-scroll" role="region" aria-label="Liste des ventes récentes" tabindex="0">
+                {% for item in recent_activity %}
+                    <div class="d-flex flex-wrap justify-content-between gap-2 py-2 border-bottom">
+                        <div>
+                            <strong>{{ item.label }}</strong>
+                            <span class="text-muted">— {{ item.client }}</span>
+                        </div>
+                        <div class="text-nowrap">
+                            <strong>{{ item.total|floatformat:0 }} FCFA</strong>
+                            <span class="text-muted ms-2">{{ item.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted mb-0">Aucune vente récente.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

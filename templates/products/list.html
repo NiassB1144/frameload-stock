@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}
+Produits - Frameload Stock
+{% endblock %}
+
+{% block page_context %}Catalogue produits{% endblock %}
+
+{% block content %}
+
+<div>
+
+
+<!-- En-tête -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+
+    <div>
+        <div class="eyebrow mb-2">Catalogue</div>
+        <h1 class="page-title h2 mb-1">
+            Produits
+        </h1>
+
+        <p class="text-muted mb-0">
+            Gestion des produits et de leur stock
+        </p>
+    </div>
+
+    {% if perms.products.add_product %}<a
+        href="{% url 'products:create' %}"
+        class="btn btn-primary"
+    ><i class="bi bi-plus-lg me-2"></i>Ajouter un produit</a>{% endif %}
+
+</div>
+
+<form method="get" class="filter-bar card mb-4">
+    <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input class="form-control" type="search" name="q" value="{{ query }}" placeholder="Rechercher par nom, référence, catégorie ou fournisseur">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Filtrer</button>
+        {% if query %}<a class="btn btn-outline-secondary" href="{% url 'products:list' %}"><i class="bi bi-arrow-counterclockwise me-1"></i>Réinitialiser</a>{% endif %}
+    </div>
+</form>
+
+
+{% if products %}
+
+<!-- Tableau -->
+<div class="card border shadow-sm">
+
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-dark">
+
+                    <tr>
+                        <th class="text-center" style="width: 70px;">
+                            N°
+                        </th>
+
+                        <th>Produit</th>
+
+                        <th>Référence</th>
+
+                        <th>Catégorie</th>
+
+                        <th>Fournisseur</th>
+
+                        <th>Prix de vente</th>
+
+                        <th>Stock</th>
+
+                        <th class="text-center">
+                            Actions
+                        </th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for product in products %}
+
+                    <tr>
+
+                        <td class="text-center fw-semibold">
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td class="fw-semibold">
+                            {{ product.name }}
+                        </td>
+
+                        <td>
+                            <span class="badge text-bg-light border">
+                                {{ product.reference }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ product.category.name }}
+                        </td>
+
+                        <td>
+                            {% if product.supplier %}
+                                {{ product.supplier.name }}
+                            {% else %}
+                                <span class="text-muted">
+                                    Aucun
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="fw-semibold">
+                            {{ product.selling_price }} FCFA
+                        </td>
+
+                        <td>
+
+                            {% if product.stock_quantity == 0 %}
+
+                                <span class="badge text-bg-danger">
+                                    Rupture
+                                </span>
+
+                            {% elif product.stock_quantity <= product.minimum_stock %}
+
+                                <span class="badge text-bg-warning">
+                                    {{ product.stock_quantity }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge text-bg-success">
+                                    {{ product.stock_quantity }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <div class="d-flex justify-content-center gap-1">
+
+                                {% if perms.products.change_product %}<a
+                                    href="{% url 'products:update' product.pk %}"
+                                    class="btn btn-outline-warning btn-sm"
+                                ><i class="bi bi-pencil me-1"></i>Modifier</a>{% endif %}
+
+                                {% if perms.products.delete_product %}<a
+                                    href="{% url 'products:delete' product.pk %}"
+                                    class="btn btn-outline-danger btn-sm"
+                                ><i class="bi bi-trash3 me-1"></i>Supprimer</a>{% endif %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<!-- Aucun produit -->
+<div class="card border shadow-sm">
+
+    <div class="card-body text-center py-5">
+
+        <h5 class="fw-semibold">
+            Aucun produit
+        </h5>
+
+        <p class="text-muted mb-4">
+            {% if query %}
+                Aucun produit ne correspond à votre recherche.
+            {% else %}
+                Aucun produit n'a encore été enregistré.
+            {% endif %}
+        </p>
+
+        {% if not query and perms.products.add_product %}<a
+            href="{% url 'products:create' %}"
+            class="btn btn-primary"
+        ><i class="bi bi-plus-lg me-2"></i>Ajouter le premier produit</a>{% endif %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+</div>
+
+{% endblock %}

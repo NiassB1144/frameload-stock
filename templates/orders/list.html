@@ -1,0 +1,232 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Commandes
+            </h2>
+
+            <p class="text-muted mb-0">
+                Historique des commandes enregistrées
+            </p>
+        </div>
+
+        <a href="{% url 'orders:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>
+            Nouvelle commande
+        </a>
+
+    </div>
+
+    <form method="get" class="filter-bar card mb-4">
+        <div class="row g-2">
+            <div class="col-md">
+                <input class="form-control" type="search" name="q" value="{{ query }}" placeholder="Numéro, client ou téléphone">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="status">
+                    <option value="">Tous les statuts</option>
+                    <option value="PENDING" {% if status == "PENDING" %}selected{% endif %}>En attente</option>
+                    <option value="CONFIRMED" {% if status == "CONFIRMED" %}selected{% endif %}>Confirmée</option>
+                    <option value="COMPLETED" {% if status == "COMPLETED" %}selected{% endif %}>Terminée</option>
+                    <option value="CANCELLED" {% if status == "CANCELLED" %}selected{% endif %}>Annulée</option>
+                </select>
+            </div>
+            <div class="col-auto"><button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Filtrer</button></div>
+            {% if query or status %}<div class="col-auto"><a class="btn btn-outline-secondary" href="{% url 'orders:list' %}"><i class="bi bi-arrow-counterclockwise me-1"></i>Réinitialiser</a></div>{% endif %}
+        </div>
+    </form>
+
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-0">
+
+            {% if orders %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>N°</th>
+                            <th>Commande</th>
+                            <th>Client</th>
+                            <th>Téléphone</th>
+                            <th>Total</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for order in orders %}
+
+                        <tr>
+
+                            <td class="fw-semibold">
+                                {{ forloop.counter }}
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge bg-light text-dark border">
+                                    {{ order.number }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if order.client_name %}
+
+                                    {{ order.client_name }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Client non renseigné
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if order.client_phone %}
+
+                                    {{ order.client_phone }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="fw-semibold">
+
+                                {{ order.total }} FCFA
+
+                            </td>
+
+
+                            <td>
+
+                                {% if order.status == "PENDING" %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        En attente
+                                    </span>
+
+                                {% elif order.status == "CONFIRMED" %}
+
+                                    <span class="badge bg-primary">
+                                        Confirmée
+                                    </span>
+
+                                {% elif order.status == "COMPLETED" %}
+
+                                    <span class="badge bg-success">
+                                        Terminée
+                                    </span>
+
+                                {% elif order.status == "CANCELLED" %}
+
+                                    <span class="badge bg-danger">
+                                        Annulée
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {{ order.created_at|date:"d/m/Y H:i" }}
+
+                            </td>
+
+
+                            <td class="text-center">
+                                <a href="{% url 'orders:detail' order.pk %}" class="btn btn-outline-primary btn-sm" title="Voir"><i class="bi bi-eye"></i></a>
+                                {% if perms.orders.change_order %}<a href="{% url 'orders:update' order.pk %}" class="btn btn-outline-warning btn-sm" title="Modifier"><i class="bi bi-pencil"></i></a>{% endif %}
+                                {% if perms.orders.delete_order %}<a href="{% url 'orders:delete' order.pk %}" class="btn btn-outline-danger btn-sm" title="Supprimer"><i class="bi bi-trash3"></i></a>{% endif %}
+                                <a href="{% url 'orders:invoice' order.pk %}" class="btn btn-outline-secondary btn-sm" title="Télécharger la facture"><i class="bi bi-file-earmark-pdf"></i></a>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            {% else %}
+
+            <div class="text-center py-5">
+
+                <div class="mb-3">
+                    <i class="bi bi-box-seam fs-1 text-muted"></i>
+                </div>
+
+
+                <h5 class="fw-bold">
+                    Aucune commande
+                </h5>
+
+
+                <p class="text-muted">
+                    {% if has_filters %}
+                        Aucune commande ne correspond à votre recherche.
+                    {% else %}
+                        Aucune commande n'a encore été enregistrée.
+                    {% endif %}
+                </p>
+
+
+                {% if not has_filters %}<a
+                    href="{% url 'orders:create' %}"
+                    class="btn btn-primary"
+                >
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Créer une commande
+                </a>{% endif %}
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

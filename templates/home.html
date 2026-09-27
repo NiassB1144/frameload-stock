@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - Frameload Stock{% endblock %}
+{% block page_context %}Accueil{% endblock %}
+
+{% block content %}
+<section class="home-card card">
+    <div class="card-body">
+        {% if user.is_authenticated %}
+            <h1 class="page-title h2">Bienvenue, {{ user.get_username }}.</h1>
+            <p class="text-muted">Choisissez une page pour commencer.</p>
+
+            <div class="d-flex flex-wrap gap-2">
+                {% if is_management %}
+                    <a class="btn btn-primary" href="{% url 'dashboard:index' %}">
+                        <i class="bi bi-grid-1x2-fill me-2"></i>Tableau de bord
+                    </a>
+                {% endif %}
+                {% if perms.products.view_product %}
+                    <a class="btn btn-outline-primary" href="{% url 'products:list' %}">
+                        <i class="bi bi-box-seam me-2"></i>Produits
+                    </a>
+                {% endif %}
+                {% if perms.sales.add_sale %}
+                    <a class="btn btn-outline-primary" href="{% url 'sales:create' %}">
+                        <i class="bi bi-cart-plus me-2"></i>Nouvelle vente
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if not is_management and not perms.products.view_product and not perms.sales.add_sale %}
+                <p class="alert alert-info mt-3 mb-0">
+                    Aucun accès n’est encore associé à votre compte. Contactez votre administrateur.
+                </p>
+            {% endif %}
+        {% else %}
+            <h1 class="page-title h2">Bienvenue sur Frameload Stock</h1>
+            <p class="text-muted">
+                Cette application permet de gérer les produits, le stock, les ventes et les commandes.
+            </p>
+            <a class="btn btn-primary" href="{% url 'login' %}">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+            </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,292 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Commande {{ order.number }}
+            </h2>
+
+            <p class="text-muted mb-0">
+                Détails de la commande
+            </p>
+        </div>
+
+        <a
+            href="{% url 'orders:list' %}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            Retour
+        </a>
+        <a href="{% url 'orders:invoice' order.pk %}" class="btn btn-primary"><i class="bi bi-file-earmark-pdf me-1"></i>Télécharger PDF</a>
+        {% if perms.orders.change_order %}<a href="{% url 'orders:update' order.pk %}" class="btn btn-outline-warning"><i class="bi bi-pencil me-1"></i>Modifier</a>{% endif %}
+        {% if perms.orders.delete_order %}<a href="{% url 'orders:delete' order.pk %}" class="btn btn-outline-danger"><i class="bi bi-trash3 me-1"></i>Supprimer</a>{% endif %}
+
+    </div>
+
+
+    <!-- Informations générales -->
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-4">
+                Informations de la commande
+            </h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small">
+                        Numéro
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ order.number }}
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small">
+                        Client
+                    </div>
+
+                    <div class="fw-semibold">
+
+                        {% if order.client_name %}
+                            {{ order.client_name }}
+                        {% else %}
+                            Client non renseigné
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small">
+                        Téléphone
+                    </div>
+
+                    <div class="fw-semibold">
+
+                        {% if order.client_phone %}
+                            {{ order.client_phone }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small">
+                        Date
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ order.created_at|date:"d/m/Y H:i" }}
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small">
+                        Statut
+                    </div>
+
+                    <div class="mt-1">
+
+                        {% if order.status == "PENDING" %}
+
+                            <span class="badge bg-warning text-dark">
+                                En attente
+                            </span>
+
+                        {% elif order.status == "CONFIRMED" %}
+
+                            <span class="badge bg-primary">
+                                Confirmée
+                            </span>
+
+                        {% elif order.status == "COMPLETED" %}
+
+                            <span class="badge bg-success">
+                                Terminée
+                            </span>
+
+                        {% elif order.status == "CANCELLED" %}
+
+                            <span class="badge bg-danger">
+                                Annulée
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small">
+                        Total
+                    </div>
+
+                    <div class="fw-bold fs-5">
+                        {{ order.total }} FCFA
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Produits -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-0">
+
+            <div class="p-4 border-bottom">
+
+                <h5 class="fw-bold mb-0">
+                    Produits commandés
+                </h5>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Produit</th>
+                            <th>Quantité</th>
+                            <th>Prix unitaire</th>
+                            <th>Total</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for item in order.items.all %}
+
+                        <tr>
+
+                            <td class="fw-semibold">
+                                {{ item.product.name }}
+                            </td>
+
+                            <td>
+                                {{ item.quantity }}
+                            </td>
+
+                            <td>
+                                {{ item.unit_price }} FCFA
+                            </td>
+
+                            <td class="fw-semibold">
+                                {{ item.total }} FCFA
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="text-center text-muted py-4"
+                            >
+                                Aucun produit associé à cette commande.
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+
+                    <tfoot>
+
+                        <tr>
+
+                            <td
+                                colspan="3"
+                                class="text-end fw-bold"
+                            >
+                                Total de la commande :
+                            </td>
+
+                            <td class="fw-bold fs-5">
+                                {{ order.total }} FCFA
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Actions -->
+    <div class="d-flex gap-2 mt-4">
+
+        <a
+            href="{% url 'orders:list' %}"
+            class="btn btn-outline-secondary"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            Retour aux commandes
+        </a>
+
+        <button
+            type="button"
+            class="btn btn-primary"
+            onclick="window.print()"
+        >
+            <i class="bi bi-printer me-1"></i>
+            Imprimer
+        </button>
+
+    </div>
+
+</div>
+
+{% endblock %}
